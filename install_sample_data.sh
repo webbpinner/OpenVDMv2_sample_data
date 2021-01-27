@@ -30,10 +30,6 @@ PREFERENCES_FILE='.install_openvdm_sample_data_preferences'
 function exit_gracefully {
     echo Exiting.
 
-    # Try deactivating virtual environment, if it's active
-    if [ -n "$INSTALL_ROOT" ];then
-        deactivate
-    fi
     return -1 2> /dev/null || exit -1  # exit correctly if sourced/bashed
 }
 
@@ -72,7 +68,7 @@ function set_default_variables {
     DEFAULT_SAMPLE_DATA_ROOT=/vault/sample_data
 
     DEFAULT_OPENVDM_REPO=https://github.com/webbpinner/OpenVDMv2_sample_data
-    DEFAULT_OPENVDM_BRANCH=master
+    DEFAULT_OPENVDM_BRANCH=main
 
     DEFAULT_OPENVDM_USER=survey
 
@@ -241,7 +237,7 @@ function update_openvdm {
 
     startingDir=${PWD}
 
-    if [ ! -d ~/OpenVDMv2_sample_data ]; then  # New install
+    if [ ! -d ~/openvdm_sample_data ]; then  # New install
         echo "Downloading OpenVDMv2 Sample Data repository"
         cd ~
         git clone -b $OPENVDM_BRANCH $OPENVDM_REPO ./openvdm_sample_data
@@ -268,21 +264,23 @@ function update_openvdm {
 
 
     read -p "Samba Password for ${DEFAULT_OPENVDM_USER}? " OPENVDM_SMBUSER_PASSWD
+    read -p "MySQL Server root password? " DATABASE_ROOT_PASSWORD
 
-    DB_EXISTS=`mysqlshow --user=${OPENVDM_USER} --password=${OPENVDM_DATABASE_PASSWORD} OpenVDMv2| grep -v Wildcard`
+    DB_EXISTS=`mysqlshow --user=root --password=${DATABASE_ROOT_PASSWORD} OpenVDMv2| grep -v Wildcard`
     if [ $? == 0 ]; then
         sed -e "s|${DEFAULT_SAMPLE_DATA_ROOT}|${SAMPLE_DATA_ROOT}|" ~/openvdm_sample_data/OpenVDMv2_sample_data.sql | \
         sed -e "s/${DEFAULT_OPENVDM_USER}/${OPENVDM_USER}/" | \
-        sed -e "s/smb_password/${OPENVDM_SMBUSER_PASSWD}/" | \
-        > /tmp/OpenVDMv2_sample_data_custom.sql
+        sed -e "s/smb_password/${OPENVDM_SMBUSER_PASSWD}/" \
+	> ~/openvdm_sample_data/OpenVDMv2_sample_data_custom.sql
 
-        mysql -u ${OPENVDM_USER} -p ${OPENVDM_DATABASE_PASSWORD} <<EOF
+	cat ~/openvdm_sample_data/OpenVDMv2_sample_data_custom.sql
+        mysql -u root -p${DATABASE_ROOT_PASSWORD} <<EOF
 USE OpenVDMv2;
-source /tmp/OpenVDMv2_sample_data_custom.sql;
+source ~/openvdm_sample_data/OpenVDMv2_sample_data_custom.sql;
 flush privileges;
 \q
 EOF
-        rm /tmp/OpenVDMv2_sample_data_custom.sql
+        rm ~/openvdm_sample_data/OpenVDMv2_sample_data_custom.sql
 
     else
         echo "Error: OpenVDMv2 database not found"
@@ -316,7 +314,7 @@ fi
 echo "#####################################################################"
 echo "OpenVDM configuration script"
 
-read -p "OpenRVDAS install root? ($DEFAULT_INSTALL_ROOT) " INSTALL_ROOT
+read -p "OpenVDM install root? ($DEFAULT_INSTALL_ROOT) " INSTALL_ROOT
 INSTALL_ROOT=${INSTALL_ROOT:-$DEFAULT_INSTALL_ROOT}
 echo "Install root will be '$INSTALL_ROOT'"
 echo
@@ -339,8 +337,6 @@ OPENVDM_USER=${OPENVDM_USER:-$DEFAULT_OPENVDM_USER}
 verify_user $OPENVDM_USER
 
 echo
-read -p "OpenVDMv2 Database password to use for user $OPENVDM_USER? ($OPENVDM_USER) " OPENVDM_DATABASE_PASSWORD
-OPENVDM_DATABASE_PASSWORD=${OPENVDM_DATABASE_PASSWORD:-$OPENVDM_USER}
 
 read -p "Root directory for sample data? ($DEFAULT_SAMPLE_DATA_ROOT) " SAMPLE_DATA_ROOT
 SAMPLE_DATA_ROOT=${SAMPLE_DATA_ROOT:-$DEFAULT_SAMPLE_DATA_ROOT}
@@ -368,7 +364,7 @@ configure_samba $OPENVDM_USER
 
 echo "#####################################################################"
 echo "Configuring Rsync Server"
-configure_gearman
+# configure_rsync
 
 echo "#####################################################################"
 echo "Updating OpenVDM"

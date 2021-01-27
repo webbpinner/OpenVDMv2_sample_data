@@ -22,11 +22,11 @@
 LOCK TABLES `OVDM_CollectionSystemTransfers` WRITE;
 /*!40000 ALTER TABLE `OVDM_CollectionSystemTransfers` DISABLE KEYS */;
 INSERT INTO `OVDM_CollectionSystemTransfers` (`name`,`longName`,`cruiseOrLowering`,`sourceDir`,`destDir`,`staleness`,`useStartDate`,`transferType`,`localDirIsMountPoint`,`rsyncServer`,`rsyncUser`,`rsyncPass`,`smbServer`,`smbUser`,`smbPass`,`smbDomain`,`sshServer`,`sshUser`,`sshUseKey`,`sshPass`,`includeFilter`,`excludeFilter`,`ignoreFilter`,`status`,`enable`,`pid`,`bandwidthLimit`)
-VALUES ('OpenRVDAS','OpenRVDAS Underway Data Acquistion System',0,'/vault/data/OpenRVDAS','OpenRVDAS',0,0,4,0,'','','','','','','','openvdm.oceandatarat.org','survey',1,NULL,'*','','',2,1,0,0),
-('XBT','Expendable Bathythermograph ',0,'/vault/data/XBT','XBT',0,0,4,0,'','','','','','','','openvdm.oceandatarat.org','survey',1,NULL,'*{cruiseID}_XBT[0-9][0-9][0-9]_*','','',2,1,0,0),
-('EM302','EM302 Multibeam Mapping System',0,'/vault/data/EM302','EM302',0,0,4,0,'','','','','','','','openvdm.oceandatarat.org','survey',1,NULL,'*','','',2,1,0,0),
-('CTD','SBE 911+ CTD',0,'/vault/data/CTD','CTD',0,0,4,0,'','','','','','','','openvdm.oceandatarat.org','survey',1,NULL,'*{cruiseID}_CTD[0-9][0-9][0-9]_*','','*decktest*',2,1,0,0),
-('Sealog','Sealog Event Logging System',0,'/vault/data/sealog','Sealog',0,0,4,0,'','','','','','','','openvdm.oceandatarat.org','survey',1,NULL,'*','','',2,1,0,0);
+VALUES ('OpenRVDAS','OpenRVDAS Underway Data Acquistion System',0,'/vault/sample_data/OpenRVDAS','OpenRVDAS',0,0,4,0,'','','','','','','','openvdm.oceandatarat.org','survey',1,NULL,'*','','',2,1,0,0),
+('XBT','Expendable Bathythermograph ',0,'/vault/sample_data/XBT','XBT',0,0,4,0,'','','','','','','','openvdm.oceandatarat.org','survey',1,NULL,'*{cruiseID}_XBT[0-9][0-9][0-9]_*','','',2,1,0,0),
+('EM302','EM302 Multibeam Mapping System',0,'/vault/sample_data/EM302','EM302',0,0,4,0,'','','','','','','','openvdm.oceandatarat.org','survey',1,NULL,'*','','',2,1,0,0),
+('CTD','SBE 911+ CTD',0,'/vault/sample_data/CTD','CTD',0,0,4,0,'','','','','','','','openvdm.oceandatarat.org','survey',1,NULL,'*{cruiseID}_CTD[0-9][0-9][0-9]_*','','*decktest*',2,1,0,0),
+('Sealog','Sealog Event Logging System',0,'/vault/sample_data/sealog','Sealog',0,0,4,0,'','','','','','','','openvdm.oceandatarat.org','survey',1,NULL,'*','','',2,1,0,0);
 /*!40000 ALTER TABLE `OVDM_CollectionSystemTransfers` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -47,7 +47,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `OVDM_ExtraDirectories` WRITE;
 /*!40000 ALTER TABLE `OVDM_ExtraDirectories` DISABLE KEYS */;
-INSERT INTO `OVDM_ExtraDirectories` (`extraDirectoryID`,`name`,`longName`,`destDir`,`enable`,`required`)
+INSERT INTO `OVDM_ExtraDirectories` (`name`,`longName`,`destDir`,`enable`,`required`)
 VALUES ('Tracklines','Cruise Tracklines','Products/Tracklines',1,0);
 /*!40000 ALTER TABLE `OVDM_ExtraDirectories` ENABLE KEYS */;
 UNLOCK TABLES;
