@@ -241,27 +241,58 @@ function update_openvdm {
 
     startingDir=${PWD}
 
+    if [ ! -d ~/OpenVDMv2_sample_data ]; then  # New install
+        echo "Downloading OpenVDMv2 Sample Data repository"
+        cd ~
+        git clone -b $OPENVDM_BRANCH $OPENVDM_REPO ./openvdm_sample_data
+        # chown ${OPENVDM_USER}:${OPENVDM_USER} ./openvdm_sample_data
+
+    else
+        cd ~/openvdm_sample_data
+
+        if [ -e .git ] ; then   # If we've already got an installation
+            echo "Updating existing OpenVDMv2 Sample Data repository"
+            git pull
+            git checkout $OPENVDM_BRANCH
+            git pull
+
+        else
+            echo "Reinstalling OpenVDMv2 Sample Data from repository"  # Bad install, re-doing
+            cd ..
+            rm -rf ./openvdm_sample_data
+            git clone -b $OPENVDM_BRANCH $OPENVDM_REPO ./openvdm_sample_data
+        fi
+    fi
+
+    cd ~/openvdm_sample_data
+
+
     read -p "Samba Password for ${DEFAULT_OPENVDM_USER}? " OPENVDM_SMBUSER_PASSWD
 
     DB_EXISTS=`mysqlshow --user=${OPENVDM_USER} --password=${OPENVDM_DATABASE_PASSWORD} OpenVDMv2| grep -v Wildcard`
     if [ $? == 0 ]; then
-        sed -e "s|${DEFAULT_SAMPLE_DATA_ROOT}|${SAMPLE_DATA_ROOT}|" ${INSTALL_ROOT}/openvdm/database/OpenVDMv2_db.sql | \
+        sed -e "s|${DEFAULT_SAMPLE_DATA_ROOT}|${SAMPLE_DATA_ROOT}|" ~/openvdm_sample_data/OpenVDMv2_sample_data.sql | \
         sed -e "s/${DEFAULT_OPENVDM_USER}/${OPENVDM_USER}/" | \
         sed -e "s/smb_password/${OPENVDM_SMBUSER_PASSWD}/" | \
-        > /tmp/OpenVDMv2_db_custom.sql
+        > /tmp/OpenVDMv2_sample_data_custom.sql
 
         mysql -u ${OPENVDM_USER} -p ${OPENVDM_DATABASE_PASSWORD} <<EOF
 USE OpenVDMv2;
-source /tmp/OpenVDMv2_db_custom.sql;
+source /tmp/OpenVDMv2_sample_data_custom.sql;
 flush privileges;
 \q
 EOF
-        rm /tmp/OpenVDMv2_db_custom.sql
+        rm /tmp/OpenVDMv2_sample_data_custom.sql
 
     else
         echo "Error: OpenVDMv2 database not found"
+        cd ${startingDir}
         exit_gracefully
     fi
+
+    tar xvzf ~/openvdm_sample_data/sample_data.tgz -C ${SAMPLE_DATA_ROOT}
+
+    cd ${startingDir}
 }
 
 
