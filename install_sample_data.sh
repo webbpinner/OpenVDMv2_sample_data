@@ -225,6 +225,114 @@ function configure_directories {
 
 }
 
+
+###########################################################################
+###########################################################################
+# Install and configure database
+function configure_rsync {
+
+    if [ -e $/etc/rsyncd.conf ]; then
+
+        mv /etc/rsyncd.conf /etc/rsyncd.conf.orig
+        sed -e '/### Added by OpenVDM_sample_data install script ###/,/### Added by OpenVDM_sample_data install script ###/d' /etc/rsyncd.conf.orig |
+        sed -e :a -e '/^\n*$/{$d;N;};/\n$/ba'  > /etc/rsyncd.conf
+    fi
+
+    cat >> /etc/rsyncd.conf <<EOF
+
+/### Added by OpenVDM_sample_data install script ###
+
+# Global configuration of the rsync service
+lock file = /var/run/rsync.lock
+log file = /var/log/rsyncd.log
+pid file = /var/run/rsyncd.pid
+
+# Data source information
+[sample_data]
+    path = ${SAMPLE_DATA_ROOT}
+    uid = ${OPENVDM_USER}
+    gid = ${OPENVDM_USER}
+    read only = yes
+    list = yes
+    auth users = ${OPENVDM_USER}
+    secrets file = /etc/rsyncd.passwd
+    hosts allow = 127.0.0.1/255.255.255.0
+
+# Data source information
+[sample_dest]
+    path = ${SAMPLE_DATA_ROOT}/rsync_destination
+    uid = ${OPENVDM_USER}
+    gid = ${OPENVDM_USER}
+    read only = no
+    list = yes
+    auth users = ${OPENVDM_USER}
+    secrets file = /etc/rsyncd.passwd
+    hosts allow = 127.0.0.1/255.255.255.0
+
+/### Added by OpenVDM_sample_data install script ###
+EOF
+
+    if [ -e $/etc/rsyncd.passwd ]; then
+
+        mv /etc/rsyncd.passwd /etc/rsyncd.passwd.orig
+        sed -e '/### Added by OpenVDM_sample_data install script ###/,/### Added by OpenVDM_sample_data install script ###/d' /etc/rsyncd.passwd.orig |
+        sed -e :a -e '/^\n*$/{$d;N;};/\n$/ba'  > /etc/rsyncd.passwd
+    fi
+
+    cat >> /etc/rsyncd.passwd <<EOF
+/### Added by OpenVDM_sample_data install script ###/
+
+${OPENVDM_USER}:${OPENVDM_SMBUSER_PASSWD}
+
+/### Added by OpenVDM_sample_data install script ###/
+EOF
+
+    echo "Restarting Samba Service"
+    systemctl restart rsyncd.service
+}
+
+function configure_directories {
+
+    if [ ! -d $SAMPLE_DATA_ROOT ]; then
+        while true; do
+            read -p "Sample data directory ${SAMPLE_DATA_ROOT} does not exists... create it? (yes) " yn
+            case $yn in
+                [Yy]* )
+                    mkdir -p ${SAMPLE_DATA_ROOT}/anon_destination
+                    mkdir -p ${SAMPLE_DATA_ROOT}/anon_source
+                    mkdir -p ${SAMPLE_DATA_ROOT}/auth_destination
+                    mkdir -p ${SAMPLE_DATA_ROOT}/auth_source
+                    mkdir -p ${SAMPLE_DATA_ROOT}/local_destination
+                    mkdir -p ${SAMPLE_DATA_ROOT}/rsync_destination
+                    mkdir -p ${SAMPLE_DATA_ROOT}/ssdw
+                    mkdir -p ${SAMPLE_DATA_ROOT}/ssh_destination
+                    chown -R ${OPENVDM_USER}:${OPENVDM_USER}
+                    chmod -R 777 ${SAMPLE_DATA_ROOT}/anon_destination
+                    chmod -R 777 ${SAMPLE_DATA_ROOT}/anon_source
+                    break;;
+                "" )
+                    mkdir -p ${SAMPLE_DATA_ROOT}/anon_destination
+                    mkdir -p ${SAMPLE_DATA_ROOT}/anon_source
+                    mkdir -p ${SAMPLE_DATA_ROOT}/auth_destination
+                    mkdir -p ${SAMPLE_DATA_ROOT}/auth_source
+                    mkdir -p ${SAMPLE_DATA_ROOT}/local_destination
+                    mkdir -p ${SAMPLE_DATA_ROOT}/rsync_destination
+                    mkdir -p ${SAMPLE_DATA_ROOT}/ssdw
+                    mkdir -p ${SAMPLE_DATA_ROOT}/ssh_destination
+                    chmod -R 777 ${SAMPLE_DATA_ROOT}/anon_destination
+                    chmod -R 777 ${SAMPLE_DATA_ROOT}/anon_source
+                    break;;
+                [Nn]* )
+                    echo "Quitting"
+                    exit_gracefully;;
+                * ) echo "Please answer yes or no.";;
+            esac
+        done
+    fi
+
+}
+
+
 ###########################################################################
 ###########################################################################
 # Install OpenVDM
@@ -360,11 +468,11 @@ configure_directories
 
 echo "#####################################################################"
 echo "Configuring Samba"
-configure_samba $OPENVDM_USER
+configure_samba
 
 echo "#####################################################################"
 echo "Configuring Rsync Server"
-# configure_rsync
+configure_rsync
 
 echo "#####################################################################"
 echo "Updating OpenVDM"
