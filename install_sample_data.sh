@@ -178,8 +178,8 @@ EOF
   veto files = /._*/.DS_Store/.Trashes*/
   delete veto files = yes
 
-[SampleAuthDestination]
-  comment=Sample Destination, non-guest access 
+[SampleAnonDestination]
+  comment=Sample Destination, guest write access 
   path=${SAMPLE_DATA_ROOT}/anon_destination
   browseable = yes
   public = yes
@@ -287,6 +287,8 @@ ${OPENVDM_USER}:b4dPassword!
 /### Added by OpenVDM_sample_data install script ###/
 EOF
 
+    chmod 600 /etc/rsyncd.passwd
+
     echo "Restarting Samba Service"
     systemctl start rsync.service
     systemctl enable rsync.service
@@ -300,28 +302,71 @@ function configure_directories {
             case $yn in
                 [Yy]* )
                     mkdir -p ${SAMPLE_DATA_ROOT}/anon_destination
-                    mkdir -p ${SAMPLE_DATA_ROOT}/anon_source
-                    mkdir -p ${SAMPLE_DATA_ROOT}/auth_destination
-                    mkdir -p ${SAMPLE_DATA_ROOT}/auth_source
-                    mkdir -p ${SAMPLE_DATA_ROOT}/local_destination
-                    mkdir -p ${SAMPLE_DATA_ROOT}/rsync_destination
-                    mkdir -p ${SAMPLE_DATA_ROOT}/ssdw
-                    mkdir -p ${SAMPLE_DATA_ROOT}/ssh_destination
-                    chown -R ${OPENVDM_USER}:${OPENVDM_USER}
                     chmod -R 777 ${SAMPLE_DATA_ROOT}/anon_destination
+
+                    mkdir -p ${SAMPLE_DATA_ROOT}/anon_source
                     chmod -R 777 ${SAMPLE_DATA_ROOT}/anon_source
+
+                    mkdir -p ${SAMPLE_DATA_ROOT}/auth_destination
+                    chown -R ${OPENVDM_USER}:${OPENVDM_USER} ${SAMPLE_DATA_ROOT}/auth_destination
+
+                    mkdir -p ${SAMPLE_DATA_ROOT}/auth_source
+                    chown -R ${OPENVDM_USER}:${OPENVDM_USER} ${SAMPLE_DATA_ROOT}/auth_source
+
+                    mkdir -p ${SAMPLE_DATA_ROOT}/local_destination
+                    chown -R ${OPENVDM_USER}:${OPENVDM_USER} ${SAMPLE_DATA_ROOT}/local_destination
+
+                    mkdir -p ${SAMPLE_DATA_ROOT}/local_source
+
+                    mkdir -p ${SAMPLE_DATA_ROOT}/rsync_destination
+                    chown -R ${OPENVDM_USER}:${OPENVDM_USER} ${SAMPLE_DATA_ROOT}/rsync_destination
+                    
+                    mkdir -p ${SAMPLE_DATA_ROOT}/rsync_source
+                    chown -R ${OPENVDM_USER}:${OPENVDM_USER} ${SAMPLE_DATA_ROOT}/rsync_source
+
+                    mkdir -p ${SAMPLE_DATA_ROOT}/ssdw
+                    chown -R ${OPENVDM_USER}:${OPENVDM_USER} ${SAMPLE_DATA_ROOT}/ssdw
+                    
+                    mkdir -p ${SAMPLE_DATA_ROOT}/ssh_destination
+                    chown -R ${OPENVDM_USER}:${OPENVDM_USER} ${SAMPLE_DATA_ROOT}/ssh_destination
+                    
+                    mkdir -p ${SAMPLE_DATA_ROOT}/ssh_source
+                    chown -R ${OPENVDM_USER}:${OPENVDM_USER} ${SAMPLE_DATA_ROOT}/ssh_source
+
                     break;;
                 "" )
                     mkdir -p ${SAMPLE_DATA_ROOT}/anon_destination
-                    mkdir -p ${SAMPLE_DATA_ROOT}/anon_source
-                    mkdir -p ${SAMPLE_DATA_ROOT}/auth_destination
-                    mkdir -p ${SAMPLE_DATA_ROOT}/auth_source
-                    mkdir -p ${SAMPLE_DATA_ROOT}/local_destination
-                    mkdir -p ${SAMPLE_DATA_ROOT}/rsync_destination
-                    mkdir -p ${SAMPLE_DATA_ROOT}/ssdw
-                    mkdir -p ${SAMPLE_DATA_ROOT}/ssh_destination
                     chmod -R 777 ${SAMPLE_DATA_ROOT}/anon_destination
+
+                    mkdir -p ${SAMPLE_DATA_ROOT}/anon_source
                     chmod -R 777 ${SAMPLE_DATA_ROOT}/anon_source
+
+                    mkdir -p ${SAMPLE_DATA_ROOT}/auth_destination
+                    chown -R ${OPENVDM_USER}:${OPENVDM_USER} ${SAMPLE_DATA_ROOT}/auth_destination
+
+                    mkdir -p ${SAMPLE_DATA_ROOT}/auth_source
+                    chown -R ${OPENVDM_USER}:${OPENVDM_USER} ${SAMPLE_DATA_ROOT}/auth_source
+
+                    mkdir -p ${SAMPLE_DATA_ROOT}/local_destination
+                    chown -R ${OPENVDM_USER}:${OPENVDM_USER} ${SAMPLE_DATA_ROOT}/local_destination
+
+                    mkdir -p ${SAMPLE_DATA_ROOT}/local_source
+
+                    mkdir -p ${SAMPLE_DATA_ROOT}/rsync_destination
+                    chown -R ${OPENVDM_USER}:${OPENVDM_USER} ${SAMPLE_DATA_ROOT}/rsync_destination
+                    
+                    mkdir -p ${SAMPLE_DATA_ROOT}/rsync_source
+                    chown -R ${OPENVDM_USER}:${OPENVDM_USER} ${SAMPLE_DATA_ROOT}/rsync_source
+
+                    mkdir -p ${SAMPLE_DATA_ROOT}/ssdw
+                    chown -R ${OPENVDM_USER}:${OPENVDM_USER} ${SAMPLE_DATA_ROOT}/ssdw
+                    
+                    mkdir -p ${SAMPLE_DATA_ROOT}/ssh_destination
+                    chown -R ${OPENVDM_USER}:${OPENVDM_USER} ${SAMPLE_DATA_ROOT}/ssh_destination
+
+                    mkdir -p ${SAMPLE_DATA_ROOT}/ssh_source
+                    chown -R ${OPENVDM_USER}:${OPENVDM_USER} ${SAMPLE_DATA_ROOT}/ssh_source
+
                     break;;
                 [Nn]* )
                     echo "Quitting"
@@ -464,6 +509,10 @@ echo "Installing required software packages and libraries"
 install_packages
 
 echo "#####################################################################"
+echo "Updating OpenVDM"
+update_openvdm
+
+echo "#####################################################################"
 echo "Creating required directories"
 configure_directories
 
@@ -474,10 +523,6 @@ configure_samba
 echo "#####################################################################"
 echo "Configuring Rsync Server"
 configure_rsync
-
-echo "#####################################################################"
-echo "Updating OpenVDM"
-update_openvdm
 
 #########################################################################
 #########################################################################
