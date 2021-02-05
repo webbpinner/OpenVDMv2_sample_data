@@ -282,13 +282,14 @@ EOF
     cat >> /etc/rsyncd.passwd <<EOF
 /### Added by OpenVDM_sample_data install script ###/
 
-${OPENVDM_USER}:${OPENVDM_SMBUSER_PASSWD}
+${OPENVDM_USER}:b4dPassword!
 
 /### Added by OpenVDM_sample_data install script ###/
 EOF
 
     echo "Restarting Samba Service"
-    systemctl restart rsyncd.service
+    systemctl start rsync.service
+    systemctl enable rsync.service
 }
 
 function configure_directories {
@@ -378,10 +379,10 @@ function update_openvdm {
     if [ $? == 0 ]; then
         sed -e "s|${DEFAULT_SAMPLE_DATA_ROOT}|${SAMPLE_DATA_ROOT}|" ~/openvdm_sample_data/OpenVDMv2_sample_data.sql | \
         sed -e "s/${DEFAULT_OPENVDM_USER}/${OPENVDM_USER}/" | \
-        sed -e "s/smb_password/${OPENVDM_SMBUSER_PASSWD}/" \
+        sed -e "s/sample_smb_passwd/${OPENVDM_SMBUSER_PASSWD}/" \
 	> ~/openvdm_sample_data/OpenVDMv2_sample_data_custom.sql
 
-	cat ~/openvdm_sample_data/OpenVDMv2_sample_data_custom.sql
+	      # cat ~/openvdm_sample_data/OpenVDMv2_sample_data_custom.sql
         mysql -u root -p${DATABASE_ROOT_PASSWORD} <<EOF
 USE OpenVDMv2;
 source ~/openvdm_sample_data/OpenVDMv2_sample_data_custom.sql;
