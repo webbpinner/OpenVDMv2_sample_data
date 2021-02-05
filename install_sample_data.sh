@@ -231,7 +231,7 @@ function configure_directories {
 # Install and configure database
 function configure_rsync {
 
-    if [ -e $/etc/rsyncd.conf ]; then
+    if [ -e /etc/rsyncd.conf ]; then
 
         mv /etc/rsyncd.conf /etc/rsyncd.conf.orig
         sed -e '/### Added by OpenVDM_sample_data install script ###/,/### Added by OpenVDM_sample_data install script ###/d' /etc/rsyncd.conf.orig |
@@ -272,7 +272,7 @@ pid file = /var/run/rsyncd.pid
 /### Added by OpenVDM_sample_data install script ###
 EOF
 
-    if [ -e $/etc/rsyncd.passwd ]; then
+    if [ -e /etc/rsyncd.passwd ]; then
 
         mv /etc/rsyncd.passwd /etc/rsyncd.passwd.orig
         sed -e '/### Added by OpenVDM_sample_data install script ###/,/### Added by OpenVDM_sample_data install script ###/d' /etc/rsyncd.passwd.orig |
