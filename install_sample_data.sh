@@ -332,6 +332,30 @@ function configure_directories {
                 * ) echo "Please answer yes or no.";;
             esac
         done
+    else
+
+        tar xvzf ~/openvdm_sample_data/sample_data.tgz -C ${SAMPLE_DATA_ROOT}
+
+        chmod -R 777 ${SAMPLE_DATA_ROOT}/anon_destination
+
+        chmod -R 777 ${SAMPLE_DATA_ROOT}/anon_source
+
+        chown -R ${OPENVDM_USER}:${OPENVDM_USER} ${SAMPLE_DATA_ROOT}/auth_destination
+
+        chown -R ${OPENVDM_USER}:${OPENVDM_USER} ${SAMPLE_DATA_ROOT}/auth_source
+
+        chown -R ${OPENVDM_USER}:${OPENVDM_USER} ${SAMPLE_DATA_ROOT}/local_destination
+
+        chown -R ${OPENVDM_USER}:${OPENVDM_USER} ${SAMPLE_DATA_ROOT}/rsync_destination
+        
+        chown -R ${OPENVDM_USER}:${OPENVDM_USER} ${SAMPLE_DATA_ROOT}/rsync_source
+
+        chown -R ${OPENVDM_USER}:${OPENVDM_USER} ${SAMPLE_DATA_ROOT}/ssdw
+        
+        chown -R ${OPENVDM_USER}:${OPENVDM_USER} ${SAMPLE_DATA_ROOT}/ssh_destination
+        
+        chown -R ${OPENVDM_USER}:${OPENVDM_USER} ${SAMPLE_DATA_ROOT}/ssh_source
+
     fi
 
 }
