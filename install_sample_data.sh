@@ -249,7 +249,7 @@ pid file = /var/run/rsyncd.pid
 
 # Data source information
 [sample_data]
-    path = ${SAMPLE_DATA_ROOT}
+    path = ${SAMPLE_DATA_ROOT}/rsync_source
     uid = ${OPENVDM_USER}
     gid = ${OPENVDM_USER}
     read only = yes
