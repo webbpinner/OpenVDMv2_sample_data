@@ -197,34 +197,6 @@ EOF
     systemctl restart smbd.service
 }
 
-function configure_directories {
-
-    if [ ! -d $SAMPLE_DATA_ROOT ]; then
-        while true; do
-            read -p "Sample data directory ${SAMPLE_DATA_ROOT} does not exists... create it? (yes) " yn
-            case $yn in
-                [Yy]* )
-                    mkdir -p ${SAMPLE_DATA_ROOT}/auth_source
-                    mkdir -p ${SAMPLE_DATA_ROOT}/anon_source
-                    mkdir -p ${SAMPLE_DATA_ROOT}/auth_destination
-                    mkdir -p ${SAMPLE_DATA_ROOT}/anon_destination
-                    break;;
-                "" )
-                    mkdir -p ${SAMPLE_DATA_ROOT}/auth_source
-                    mkdir -p ${SAMPLE_DATA_ROOT}/anon_source
-                    mkdir -p ${SAMPLE_DATA_ROOT}/auth_destination
-                    mkdir -p ${SAMPLE_DATA_ROOT}/anon_destination
-                    break;;
-                [Nn]* )
-                    echo "Quitting"
-                    exit_gracefully;;
-                * ) echo "Please answer yes or no.";;
-            esac
-        done
-    fi
-
-}
-
 
 ###########################################################################
 ###########################################################################
@@ -301,70 +273,56 @@ function configure_directories {
             read -p "Sample data directory ${SAMPLE_DATA_ROOT} does not exists... create it? (yes) " yn
             case $yn in
                 [Yy]* )
-                    mkdir -p ${SAMPLE_DATA_ROOT}/anon_destination
+
+                    mkdir -p ${SAMPLE_DATA_ROOT}
+
+                    tar xvzf ~/openvdm_sample_data/sample_data.tgz -C ${SAMPLE_DATA_ROOT}
+
                     chmod -R 777 ${SAMPLE_DATA_ROOT}/anon_destination
 
-                    mkdir -p ${SAMPLE_DATA_ROOT}/anon_source
                     chmod -R 777 ${SAMPLE_DATA_ROOT}/anon_source
 
-                    mkdir -p ${SAMPLE_DATA_ROOT}/auth_destination
                     chown -R ${OPENVDM_USER}:${OPENVDM_USER} ${SAMPLE_DATA_ROOT}/auth_destination
 
-                    mkdir -p ${SAMPLE_DATA_ROOT}/auth_source
                     chown -R ${OPENVDM_USER}:${OPENVDM_USER} ${SAMPLE_DATA_ROOT}/auth_source
 
-                    mkdir -p ${SAMPLE_DATA_ROOT}/local_destination
                     chown -R ${OPENVDM_USER}:${OPENVDM_USER} ${SAMPLE_DATA_ROOT}/local_destination
 
-                    mkdir -p ${SAMPLE_DATA_ROOT}/local_source
-
-                    mkdir -p ${SAMPLE_DATA_ROOT}/rsync_destination
                     chown -R ${OPENVDM_USER}:${OPENVDM_USER} ${SAMPLE_DATA_ROOT}/rsync_destination
                     
-                    mkdir -p ${SAMPLE_DATA_ROOT}/rsync_source
                     chown -R ${OPENVDM_USER}:${OPENVDM_USER} ${SAMPLE_DATA_ROOT}/rsync_source
 
-                    mkdir -p ${SAMPLE_DATA_ROOT}/ssdw
                     chown -R ${OPENVDM_USER}:${OPENVDM_USER} ${SAMPLE_DATA_ROOT}/ssdw
                     
-                    mkdir -p ${SAMPLE_DATA_ROOT}/ssh_destination
                     chown -R ${OPENVDM_USER}:${OPENVDM_USER} ${SAMPLE_DATA_ROOT}/ssh_destination
                     
-                    mkdir -p ${SAMPLE_DATA_ROOT}/ssh_source
                     chown -R ${OPENVDM_USER}:${OPENVDM_USER} ${SAMPLE_DATA_ROOT}/ssh_source
 
                     break;;
                 "" )
-                    mkdir -p ${SAMPLE_DATA_ROOT}/anon_destination
+
+                    mkdir -p ${SAMPLE_DATA_ROOT}
+
+                    tar xvzf ~/openvdm_sample_data/sample_data.tgz -C ${SAMPLE_DATA_ROOT}
+
                     chmod -R 777 ${SAMPLE_DATA_ROOT}/anon_destination
 
-                    mkdir -p ${SAMPLE_DATA_ROOT}/anon_source
                     chmod -R 777 ${SAMPLE_DATA_ROOT}/anon_source
 
-                    mkdir -p ${SAMPLE_DATA_ROOT}/auth_destination
                     chown -R ${OPENVDM_USER}:${OPENVDM_USER} ${SAMPLE_DATA_ROOT}/auth_destination
 
-                    mkdir -p ${SAMPLE_DATA_ROOT}/auth_source
                     chown -R ${OPENVDM_USER}:${OPENVDM_USER} ${SAMPLE_DATA_ROOT}/auth_source
 
-                    mkdir -p ${SAMPLE_DATA_ROOT}/local_destination
                     chown -R ${OPENVDM_USER}:${OPENVDM_USER} ${SAMPLE_DATA_ROOT}/local_destination
 
-                    mkdir -p ${SAMPLE_DATA_ROOT}/local_source
-
-                    mkdir -p ${SAMPLE_DATA_ROOT}/rsync_destination
                     chown -R ${OPENVDM_USER}:${OPENVDM_USER} ${SAMPLE_DATA_ROOT}/rsync_destination
                     
-                    mkdir -p ${SAMPLE_DATA_ROOT}/rsync_source
                     chown -R ${OPENVDM_USER}:${OPENVDM_USER} ${SAMPLE_DATA_ROOT}/rsync_source
 
-                    mkdir -p ${SAMPLE_DATA_ROOT}/ssdw
                     chown -R ${OPENVDM_USER}:${OPENVDM_USER} ${SAMPLE_DATA_ROOT}/ssdw
                     
-                    mkdir -p ${SAMPLE_DATA_ROOT}/ssh_destination
                     chown -R ${OPENVDM_USER}:${OPENVDM_USER} ${SAMPLE_DATA_ROOT}/ssh_destination
-
-                    mkdir -p ${SAMPLE_DATA_ROOT}/ssh_source
+                    
                     chown -R ${OPENVDM_USER}:${OPENVDM_USER} ${SAMPLE_DATA_ROOT}/ssh_source
 
                     break;;
@@ -441,8 +399,6 @@ EOF
         cd ${startingDir}
         exit_gracefully
     fi
-
-    tar xvzf ~/openvdm_sample_data/sample_data.tgz -C ${SAMPLE_DATA_ROOT}
 
     cd ${startingDir}
 }
